@@ -7,12 +7,14 @@ def get_all_classes(directory):
     classes = []
     for filename in os.listdir(directory):
         if filename.endswith(".jpg"):  
+            
+            filename = filename.replace('#', '')
             delimiters = '[.-]'
-        result = re.split(delimiters, filename)
-        result = [item for item in result if item]
-        classes.append(result[2])
+            result = re.split(delimiters, filename)
+            result = [item for item in result if item]
+            classes.append(result[2])
     return classes
-path = 'INSERT DIRECTORY PATH'
+#path = '../example_images'
 #classes = get_all_classes(path)
 
 
