@@ -13,7 +13,7 @@ def load_config_from_url(url: str) -> str:
         return f.read().decode()
 
 def getSegmentationHead():
-    HEAD_SCALE_COUNT = 3 # more scales: slower but better results, in (1,2,3,4,5)
+    HEAD_SCALE_COUNT = 5 # more scales: slower but better results, in (1,2,3,4,5)
     HEAD_DATASET = "voc2012" # in ("ade20k", "voc2012")
     HEAD_TYPE = "ms" # in ("ms, "linear")
 
