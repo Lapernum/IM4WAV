@@ -1,5 +1,7 @@
 import re
 import os
+import torch
+import clip
 
 directory = 'INSERT DIRECTORY PATH'
 classes = []
