@@ -4,11 +4,13 @@ from functools import partial
 
 import torch
 import torch.nn.functional as F
+from mmseg.apis import init_segmentor
 
 import sys,os
 sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))
 
 from model.dinov2.eval.depth.models import build_depther
+import model.dinov2.eval.segmentation.models
 
 class CenterPadding(torch.nn.Module):
     def __init__(self, multiple):
@@ -46,3 +48,15 @@ def create_depther(cfg, backbone_model, backbone_size, head_type):
         depther.backbone.register_forward_pre_hook(lambda _, x: CenterPadding(backbone_model.patch_size)(x[0]))
 
     return depther
+
+def create_segmenter(cfg, backbone_model):
+    model = init_segmentor(cfg)
+    model.backbone.forward = partial(
+        backbone_model.get_intermediate_layers,
+        n=cfg.model.backbone.out_indices,
+        reshape=True,
+    )
+    if hasattr(backbone_model, "patch_size"):
+        model.backbone.register_forward_pre_hook(lambda _, x: CenterPadding(backbone_model.patch_size)(x[0]))
+    model.init_weights()
+    return model

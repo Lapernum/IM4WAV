@@ -13,7 +13,7 @@ def load_config_from_url(url: str) -> str:
     with urllib.request.urlopen(url) as f:
         return f.read().decode()
 
-def getDepthModel():
+def getDepthHead():
     HEAD_DATASET = "nyu" # in ("nyu", "kitti")
     HEAD_TYPE = "dpt" # in ("linear", "linear4", "dpt")
     
