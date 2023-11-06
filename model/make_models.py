@@ -23,7 +23,7 @@ HEAD_DATASET = "voc2012"
 IMAGE_WIDTH = 320
 IMAGE_HEIGHT = 240
 
-DISTANCE_PERCENTAGE = 0.9
+DISTANCE_PERCENTAGE = 0.7
 
 CLIP_THRESHOLD = 32
 
@@ -154,7 +154,7 @@ def predict_segmentation(input_image, model_choice):
 
     if model_choice == "head":
         seg_model = getSegmentationHead()
-    elif model_choice == "model":  
+    elif model_choice == "model":
         seg_model = getSegmentationModel()
     else:
         print("Invalid model choice")
@@ -211,7 +211,14 @@ def clip_segmentation_with_volume(depth_image, segmentation_image, original_path
             ROI_depth = ROI_depth[ROI_depth != 0]
             ROI_depth_mean = np.mean(ROI_depth)
             ROI_horizontal_factor = ((IMAGE_WIDTH / 2) - (x + 0.5 * w)) / float(IMAGE_WIDTH)
-            volume_factor.append((ROI_depth_mean * DISTANCE_PERCENTAGE + ROI_horizontal_factor * (1 - DISTANCE_PERCENTAGE), ROI_depth_mean * DISTANCE_PERCENTAGE - ROI_horizontal_factor * (1 - DISTANCE_PERCENTAGE)))
+            if ROI_horizontal_factor >= 0:
+                # the segment is on the left side
+                ROI_horizontal_factor += 0.5
+                volume_factor.append((ROI_depth_mean * DISTANCE_PERCENTAGE + ROI_horizontal_factor * (1 - DISTANCE_PERCENTAGE), ROI_depth_mean * DISTANCE_PERCENTAGE + (1 - ROI_horizontal_factor) * (1 - DISTANCE_PERCENTAGE)))
+            else:
+                # the segment is on the right side
+                ROI_horizontal_factor -= 0.5
+                volume_factor.append((ROI_depth_mean * DISTANCE_PERCENTAGE + (1 + ROI_horizontal_factor) * (1 - DISTANCE_PERCENTAGE), ROI_depth_mean * DISTANCE_PERCENTAGE - ROI_horizontal_factor * (1 - DISTANCE_PERCENTAGE)))
             ROI = cv_original_image[y:y+h, x:x+w]
             
             delimiters = '[.]'
