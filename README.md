@@ -1,3 +1,3 @@
 # IM4WAV
 
-![alt text](Images/im4wav_structure.png)
+![alt text](Images/IM4WAV_4.png)
