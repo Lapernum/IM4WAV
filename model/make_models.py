@@ -2,6 +2,7 @@ import urllib
 import torch
 import cv2
 import re
+import math
 import matplotlib
 import numpy as np
 from torchvision import transforms
@@ -20,10 +21,12 @@ DATASET_COLORMAPS = {
 
 HEAD_DATASET = "voc2012"
 
+HALF_ANGLE_TAN = math.tan(5 * math.pi / 36)
+
 IMAGE_WIDTH = 320
 IMAGE_HEIGHT = 240
 
-DISTANCE_PERCENTAGE = 0.7
+DISTANCE_PERCENTAGE = 0.5
 
 CLIP_THRESHOLD = 32
 
@@ -201,24 +204,31 @@ def clip_segmentation_with_volume(depth_image, segmentation_image, original_path
         # Find contours, obtain bounding box, extract and save ROI
         cnts = cv2.findContours(opening, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cnts = cnts[0] if len(cnts) == 2 else cnts[1]
-        for c in cnts:
+        for idx, c in enumerate(cnts):
             x,y,w,h = cv2.boundingRect(c)
             if w < CLIP_THRESHOLD or h < CLIP_THRESHOLD:
                 continue
-            # c_mask = np.zeros((240, 320), np.uint8)
-            # cv2.drawContours(c_mask, c, -1, (255, 255, 255), -1)
-            ROI_depth = masked_depth_image[y:y+h, x:x+w]
-            ROI_depth = ROI_depth[ROI_depth != 0]
+            c_mask = np.zeros((IMAGE_HEIGHT, IMAGE_HEIGHT), np.uint8)
+            cv2.drawContours(c_mask, cnts, idx, 255, -1)
+            ROI_depth = masked_depth_image[c_mask == 255]
             ROI_depth_mean = np.mean(ROI_depth)
-            ROI_horizontal_factor = ((IMAGE_WIDTH / 2) - (x + 0.5 * w)) / float(IMAGE_WIDTH)
-            if ROI_horizontal_factor >= 0:
-                # the segment is on the left side
-                ROI_horizontal_factor += 0.5
-                volume_factor.append((ROI_depth_mean * DISTANCE_PERCENTAGE + ROI_horizontal_factor * (1 - DISTANCE_PERCENTAGE), ROI_depth_mean * DISTANCE_PERCENTAGE + (1 - ROI_horizontal_factor) * (1 - DISTANCE_PERCENTAGE)))
+            ROI_depth_factor = ROI_depth_mean ** 2 # Get the depth factor
+
+            ROI_horizontal_ratio = ((x + 0.5 * w) - (IMAGE_WIDTH / 2.0)) / float(IMAGE_WIDTH)
+            ROI_horizontal_angle = math.atan(2 * abs(ROI_horizontal_ratio) * HALF_ANGLE_TAN)
+
+            if ROI_horizontal_ratio < 0:
+                # Get the horizontal factor if the object is on the left half
+                ROI_horizontal_factor_leftC = math.cos(((0.5 * math.pi) - ROI_horizontal_angle) / 2)
+                ROI_horizontal_factor_rightC = math.sin(((0.5 * math.pi) - ROI_horizontal_angle) / 2)
             else:
-                # the segment is on the right side
-                ROI_horizontal_factor -= 0.5
-                volume_factor.append((ROI_depth_mean * DISTANCE_PERCENTAGE + (1 + ROI_horizontal_factor) * (1 - DISTANCE_PERCENTAGE), ROI_depth_mean * DISTANCE_PERCENTAGE - ROI_horizontal_factor * (1 - DISTANCE_PERCENTAGE)))
+                # Get the horizontal factor if the object is on the right half
+                ROI_horizontal_factor_leftC = math.cos(((0.5 * math.pi) + ROI_horizontal_angle) / 2)
+                ROI_horizontal_factor_rightC = math.sin(((0.5 * math.pi) + ROI_horizontal_angle) / 2)
+
+            volume_factor.append((DISTANCE_PERCENTAGE * ROI_depth_factor + (1 - DISTANCE_PERCENTAGE) * ROI_horizontal_factor_leftC, DISTANCE_PERCENTAGE * ROI_depth_factor + (1 - DISTANCE_PERCENTAGE) * ROI_horizontal_factor_rightC))
+
+            # Save the cropped segments from the original image
             ROI = cv_original_image[y:y+h, x:x+w]
             
             delimiters = '[.]'
