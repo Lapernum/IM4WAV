@@ -3,3 +3,8 @@ mmsegmentation/
 **/__pycache__
 *.pyc
 test_images/
+models/image_CLIP
+models/video_CLIP
+models/video_CLIP_large
+*.mp3
+models/logs
