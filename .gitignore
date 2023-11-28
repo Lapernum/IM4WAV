@@ -6,5 +6,9 @@ test_images/
 models/image_CLIP
 models/video_CLIP
 models/video_CLIP_large
+models/video_CLIP_smaller
+models/video_CLIP_3
+models/video_CLIP_small
+models/video_CLIP.zip
 *.mp3
 models/logs

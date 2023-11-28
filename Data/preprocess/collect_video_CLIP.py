@@ -63,8 +63,8 @@ def handle_video(video, global_info):
         if os.path.exists(pickle_name):
             return
         videodata, length_in_secs, frame_num, video_name = read_video(video, global_info)
-        # video_to_embed = [Image.fromarray(frame) for frame in videodata]
-        video_to_embed = [Image.fromarray(videodata[int(len(videodata) / 5)]), Image.fromarray(videodata[int(len(videodata) / 2)]), Image.fromarray(videodata[int(4 * len(videodata) / 5)])]
+        video_to_embed = [Image.fromarray(frame) for frame in videodata]
+        # video_to_embed = [Image.fromarray(videodata[int(len(videodata) / 5)]), Image.fromarray(videodata[int(len(videodata) / 2)]), Image.fromarray(videodata[int(4 * len(videodata) / 5)])]
         image_features = get_video_clip(video_to_embed, global_info["device"], global_info["model"], global_info)
         file2CLIP = {}
         file2CLIP[video_name] = image_features
