@@ -5,8 +5,8 @@ import torch.nn as nn
 import mmcv
 from mmcv.runner import load_checkpoint
 
-from backbone import *
-from utils import *
+from models.layer.backbone import *
+from models.layer.utils import *
 
 
 def load_config_from_url(url: str) -> str:

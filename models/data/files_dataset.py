@@ -110,7 +110,7 @@ class FilesAudioDataset(Dataset):
             with open(os.path.join(self.CLIP_path, f'{fileName}.pickle'), 'rb') as handle:
                 clip_emb = pickle.load(handle)[fileName]
             # clip_emb = self.file2CLIP[fileName]
-            frames_per_sec = (clip_emb.shape[0] / 10.0)
+            frames_per_sec = 25 # (clip_emb.shape[0] / 10.0)
             offset_in_sec, length_in_sec = offset / float(self.sr), self.sample_length / float(self.sr)
             start = int(offset_in_sec * frames_per_sec)
             end = int(start + length_in_sec*frames_per_sec)
@@ -118,7 +118,7 @@ class FilesAudioDataset(Dataset):
             if sample_clip_emb.size == 0:
                 print("NO WAY !!!!!!!!!!!")
                 print(fileName)
-                print("HOLY SHIT!!!!!!!!!!!!!!!!!!!!")
+                print("HOLY SSS!!!!!!!!!!!!!!!!!!!!")
             mean_sample_clip_emb = np.mean(sample_clip_emb, axis=0)
             if self.video_clip_emb:
                 return sample_clip_emb
