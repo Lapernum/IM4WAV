@@ -9,8 +9,8 @@ from mmseg.apis import init_segmentor
 import sys,os
 sys.path.append(os.path.join(os.path.dirname(__file__), "../.."))
 
-from model.dinov2.eval.depth.models import build_depther
-import model.dinov2.eval.segmentation.models
+from models.dinov2.eval.depth.models import build_depther
+import models.dinov2.eval.segmentation.models
 
 class CenterPadding(torch.nn.Module):
     def __init__(self, multiple):

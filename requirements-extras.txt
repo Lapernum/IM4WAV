@@ -1,5 +1,0 @@
-mmengine==0.2.0
-mmcv-full==1.6.2
-mmsegmentation==0.29.0
-mmcls==0.25.0
-mmaction2==1.2.0

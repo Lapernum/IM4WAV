@@ -8,11 +8,11 @@ import numpy as np
 from torchvision import transforms
 
 from PIL import Image
-from layer.depth import getDepthHead
-from layer.segmentation import getSegmentationHead, getSegmentationModel
+from models.layer.depth import getDepthHead
+from models.layer.segmentation import getSegmentationHead, getSegmentationModel
 from mmseg.apis import inference_segmentor
 
-import model.dinov2.eval.segmentation.utils.colormaps as colormaps
+import models.dinov2.eval.segmentation.utils.colormaps as colormaps
 
 DATASET_COLORMAPS = {
     "ade20k": colormaps.ADE20K_COLORMAP,
@@ -191,7 +191,10 @@ def clip_segmentation_with_volume(depth_image, segmentation_image, original_path
     
     ROI_number = 0
     volume_factor = []
+    ROI_list = []
     for gray_scale in list(np.array(range(101)) / 100.0):
+
+        # print("rounded_segmented_image: ", rounded_segmented_image.shape)
         # Morph open to remove noise
         test_gray_image = np.copy(rounded_segmented_image)
         test_gray_image[test_gray_image!=gray_scale] = 0
@@ -208,7 +211,7 @@ def clip_segmentation_with_volume(depth_image, segmentation_image, original_path
             x,y,w,h = cv2.boundingRect(c)
             if w < CLIP_THRESHOLD or h < CLIP_THRESHOLD:
                 continue
-            c_mask = np.zeros((IMAGE_HEIGHT, IMAGE_HEIGHT), np.uint8)
+            c_mask = np.zeros((IMAGE_HEIGHT, IMAGE_WIDTH), np.uint8)
             cv2.drawContours(c_mask, cnts, idx, 255, -1)
             ROI_depth = masked_depth_image[c_mask == 255]
             ROI_depth_mean = np.mean(ROI_depth)
@@ -231,11 +234,12 @@ def clip_segmentation_with_volume(depth_image, segmentation_image, original_path
             # Save the cropped segments from the original image
             ROI = cv_original_image[y:y+h, x:x+w]
             
-            delimiters = '[.]'
-            result = re.split(delimiters, original_path)
-            result = [item for item in result if item]
+            # delimiters = '[.]'
+            # result = re.split(delimiters, original_path)
+            # result = [item for item in result if item]
             
-            cv2.imwrite(OUTPUT_PATH + '/' + result[0] + '.ROI-{}.png'.format(ROI_number), ROI)
+            # cv2.imwrite(OUTPUT_PATH + '/' + result[0] + '.ROI-{}.png'.format(ROI_number), ROI)
+            ROI_list.append(Image.fromarray(ROI))
             ROI_number += 1
 
-    return volume_factor
+    return (volume_factor, ROI_list)

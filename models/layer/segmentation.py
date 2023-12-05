@@ -3,10 +3,10 @@ import urllib
 import mmcv
 from mmcv.runner import load_checkpoint
 
-import model.dinov2.eval.segmentation_m2f.models.segmentors
+import models.dinov2.eval.segmentation_m2f.models.segmentors
 
-from backbone import *
-from utils import *
+from models.layer.backbone import *
+from models.layer.utils import *
 
 def load_config_from_url(url: str) -> str:
     with urllib.request.urlopen(url) as f:
