@@ -1,6 +1,6 @@
 # IM4WAV
 
-![Alt text](Images/IM4WAV-6.png)
+![Alt text](Images/IM4WAV-7.png)
 *IM4WAV Architecture Diagram*
 
 ## Abstract
