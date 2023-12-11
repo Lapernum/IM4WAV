@@ -1,4 +1,4 @@
-*Notice: This is a still ongoing project.
+*Notice: This is a still ongoing project, but with temporary results available. Project report available.
 
 # IM4WAV
 
